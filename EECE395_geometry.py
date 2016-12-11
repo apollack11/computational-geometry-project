@@ -2,6 +2,9 @@
 
 import sys
 import math
+import numpy as np
+from scipy.spatial import Delaunay
+from collections import OrderedDict
 
 class Point2D:
     """ Simple class for a point """
@@ -17,14 +20,11 @@ class Point2D:
         return "({0}, {1})".format(self.x, self.y)
 
     def __cmp__(self, other):
+        """ returns True if they are at the same location x, y """
         # TODO: throw exception if obj is not of type Point2D
-        if other == None:
-            return -1
-        elif self.y < other.y:
-            return -1
-        elif self.y > other.y:
-            return 1
-        else: return 0
+        if self.x == other.x and self.y == other.y: return 0
+        # TODO: what to do here?
+        else: return -1
 
     def __add__(self, other):
         x = self.x + other.x
@@ -67,7 +67,14 @@ class Line2D:
         self.color = color
 
     def __str__(self):
-        return "{0} --> {1}".format(self.p0, self.p1)
+        return "{0} --> {1}".format(self.a, self.b)
+
+    def __cmp__(self, other):
+        
+        if (self.a == other.a and self.b == other.b) or (self.b == other.a and self.a == other.b):
+            return 0
+        # TODO: what if lines are not at the same points? maybe return biggest slope?
+        else: return -1
 
     def intersects(other):
         # http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
@@ -108,7 +115,7 @@ class Polygon:
     """ Simple class for a polygon """
     def __init__(self, vertices = None):
         self.vertices = []
-        sself.edges = []
+        self.edges = []
         if vertices != None:
             i = 0
             while i < len(vertices) - 1:
@@ -127,6 +134,35 @@ class Polygon:
     def add_point(self, p):
         """ Adds a point to Polygon. Caution: Polygon should be represented counterclockwise """
         self.vertices.append(p)
+
+    def Triangulate(self):
+        points = []
+        for p in self.vertices:
+            points.append([p.x, p.y])
+        tri = Delaunay(points)
+        lines = []
+        for s in tri.simplices:
+            p1x, p1y = points[s[0]]
+            p2x, p2y = points[s[1]]
+            p3x, p3y = points[s[2]]
+            p1 = Point2D(p1x, p1y)
+            p2 = Point2D(p2x, p2y)
+            p3 = Point2D(p3x, p3y)
+            l1 = Line2D(p1, p2)
+            l2 = Line2D(p2, p3)
+            l3 = Line2D(p3, p1)
+            lines.append(l1)
+            lines.append(l2)
+            lines.append(l3)
+        # print list(OrderedDict.fromkeys(lines))
+        duplicates = []
+        for idx, val in enumerate(lines):
+            if val in lines[idx+1:]:
+                duplicates.append(idx)
+        for d in reversed(duplicates):
+            lines.pop(d)
+        return lines
+        
 
 ######################################### Helpers #########################################
 def orientation(a, b, c):
@@ -173,10 +209,18 @@ def test_polygon_hierarchy():
     lineB = Line2D(p1, p2)
 
     shape = Polygon([origin, p1, p2])
-    print "shape is {0}".format(shape)    
+    print "shape is {0}".format(shape)
+
+def test_triangulate():
+    P = Polygon([Point2D(0,0),
+                 Point2D(0,1.1),
+                 Point2D(1,0),
+                 Point2D(1,1)])
+    tri = P.Triangulate()
+    print len(tri)
 
 def main(argv):
-    test_polygon_hierarchy()
+    test_triangulate()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -5,6 +5,10 @@ import sys
 from GZ_geometry import Polygon as Polygon
 from GZ_geometry import Line2D as Line
 from GZ_geometry import Point2D as Point2D
+import numpy as np
+import scipy
+from bintrees import BinaryTree
+from k_partition import # functionAdam
 
 SPEED = 1 # can make this a choice later where var is initialized at max_speed
 
@@ -28,7 +32,9 @@ class Game:
         self.bg = BattleGround(polygon) # model
         self.view = View()               # view
         self.state = GameState.E_TURN  # state of game
-        self.block_graph = []
+        self.algorithm = AlgoState.K_PART
+        self.block_graph = BinaryTree()
+        # insert known cut lines from paper
 
     def Start(self):
         while not self.state == GameState.GAME_OVER:
@@ -40,13 +46,16 @@ class Game:
                 continue
             if self.state == GameState.P_TURN:
                 if AlgoState.K_PART:
-                    # self.block_graph = k_partition # TODO must: get this to work with k block code (need cut edges)
-                    self.block_graph = 0
-                    self.bg.Be = LocalizeEvader() # give Be to pursuers
-                    # TODO: determine where to place pursuers on cut edges
+                    # TODO: get this working with k_partition
+                    # self.block_graph = functionAdam(inputs)
+                    # self.bg.Be = LocalizeEvader() # give Be to pursuers
+                    # TODO help: determine where to place pursuers on cut edges
                     self.bg.MovePursuers()
+                    self.algorithm = AlgoState.SWEEP
+                    continue
                 if AlgoState.SWEEP:
                     """
+                    # determines e is in line of sight of pursuers
                     for p in self.bg.pursuers:
                         # is e in p line-of-sight?
                         los = True
@@ -55,15 +64,15 @@ class Game:
                             if line.intersects(edge):
                                 los = False
                     """
-                    # if evader is trapped in B+
-                    # TODO
+                    if self.bg.Be is not None: # if evader is trapped
+                        self.algorithm = AlgoState.CAPTURE
+                        continue
                 if AlgoState.CAPTURE:
                     # evader is confined to an extended k-block
                     # need O(k) pursuers
-
                     # phase 1: 
                     # triangulate kP (polygon of k-block)
-                    boundaries = triangulate(kP)
+                    boundaries = Triangulate(kP)
                     # assign one pursuer to each edge of triangulation at projection
                     self.bg.ClearPursuers()
                     for line in boundaries:
@@ -130,6 +139,10 @@ class BattleGround:
         self.evader.Move(newX, newY)
         # TODO: if evader moves across cut edge, update Be (Lemma 2)
 
+    def IsTrapped(self):
+        # TODO: make this dynamic
+        self.bg.Be = 2
+        
 class View:
     """ The view of the board """
     @staticmethod
@@ -192,6 +205,18 @@ def parse_polygon(lines):
             i = i + 1
             poly = Polygon(ps)
     return poly
+
+def temp_k():
+    """ cut lines for Input1.txt """
+    lines = []
+    lines.append(Point2D(0, 0), Point2D(6, 6))
+    lines.append(Point2D(13, 6), Point2D(16, 4))
+    lines.append(Point2D(13, 6), Point2D(21, 8))
+    lines.append(Point2D(16, 4), Point2D(21, 8))
+    lines.append(Point2D(21, 8), Point2D(27, -1))
+    lines.append(Point2D(21, 8), Point2D(23, 10))
+    lines.append(Point2D(21, 10), Point2D(27, -1))
+    return lines
 
 def main(argv):
     P = parse_polygon(read_file(argv[0]))
