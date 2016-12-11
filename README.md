@@ -12,3 +12,6 @@ When the programing is running, you can use the following command in terminal:
 ```
 ./Algorithm.py PaperInput.txt
 ```
+
+## k_block_partition.py  
+Takes in a set of points from Algorithm.py which represent a polygonal region. Outputs a block graph of the k-block partition of the region. We were unable to get this part of the program completely working due to difficulties with triangulation and conversion of the output into a block graph.
