@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import sys
 from GZ_geometry import Polygon as Polygon
 from GZ_geometry import Line2D as Line
@@ -78,11 +77,12 @@ class Game:
                     for line in boundaries:
                         p = self.bg.e.pose.ProjectionOnLine(line)
                         self.bg.AddPursuer(p.x, p.y)
-
+                    
                     # phase 2:
                     # move triangles inward
-
-
+                    
+                    if Funtion2(self.bg.evader, self.bg.pursuers):    # is capture possible?
+                        
                     # GameState.GAME_OVER
                     pass
                 self.state = GameState.E_TURN
