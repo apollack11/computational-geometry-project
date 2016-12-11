@@ -81,17 +81,17 @@ def main():
     ax.set_ylim(-5,20)
     tri = Delaunay(points)
 
-    # print tri.simplices[1]
-    # interiorSimplices = []
-    # for i in range(0,len(tri.simplices)-1):
-    #     triPath = trianglePath(points, tri.simplices[i])
-    #     # testPoint = triangleCenter(TRIANGLE_VERTICES)
-    #     # if path.contains_point(testPoint) and tri_path.contains_point(testPoint):
-    #     #     print "Triangle is within the polygon"
-    #     #     interiorSimplices.append(tri.simplices[i])
-    #     # else:
-    #     #     print "Not in polygon"
-    # print interiorSimplices[:]
+    print tri.simplices[1]
+    interiorSimplices = []
+    for i in range(0,len(tri.simplices)-1):
+        triPath = trianglePath(points, tri.simplices[i])
+        # testPoint = triangleCenter(TRIANGLE_VERTICES)
+        # if path.contains_point(testPoint) and tri_path.contains_point(testPoint):
+        #     print "Triangle is within the polygon"
+        #     interiorSimplices.append(tri.simplices[i])
+        # else:
+        #     print "Not in polygon"
+    print interiorSimplices[:]
 
     plt.triplot(points[:,0], points[:,1], tri.simplices.copy())
     plt.plot(points[:,0], points[:,1], 'o')
@@ -99,7 +99,12 @@ def main():
 
 def trianglePath(points, pointIndices):
     print points[pointIndices[0]]
-    triPoints = [[points.item(pointIndices[0])],[points.item(pointIndices[1])],[points.item(pointIndices[2])],[points.item(pointIndices[0])]]
+    triPoints = [
+    [points.item(pointIndices[0],0),points.item(pointIndices[0],1)],
+    [points.item(pointIndices[1],0),points.item(pointIndices[1],1)],
+    [points.item(pointIndices[2],0),points.item(pointIndices[2],1)],
+    [points.item(pointIndices[0],0),points.item(pointIndices[0],1)]
+    ]
     print "^^^^^^^^"
     print triPoints
     codes = [Path.MOVETO,
