@@ -2,7 +2,7 @@
 import random
 import math
 from k_block_partition import points
-import GZ_geometry
+import EECE395_geometry
 import Algorithm
 
 def getDistance(e, ps):

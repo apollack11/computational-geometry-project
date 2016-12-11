@@ -81,10 +81,8 @@ class Game:
                     # phase 2:
                     # move triangles inward
                     
-                    if Funtion2(self.bg.evader, self.bg.pursuers):    # is capture possible?
-                        
-                    # GameState.GAME_OVER
-                    pass
+                    if CanCapture(self.bg.evader, self.bg.pursuers):    # is capture possible?
+                        self.state = GameState.GAME_OVER
                 self.state = GameState.E_TURN
                 continue
 
