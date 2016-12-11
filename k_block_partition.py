@@ -70,9 +70,6 @@ def main():
 
     path = Path(points, codes)
 
-    print path.contains_point((200, 100))
-    print path.contains_point((1, 1))
-
     fig = plt.figure()
     ax = fig.add_subplot(111)
     patch = patches.PathPatch(path, facecolor="white", lw=2)
@@ -81,39 +78,34 @@ def main():
     ax.set_ylim(-5,20)
     tri = Delaunay(points)
 
-    print tri.simplices[1]
     interiorSimplices = []
     for i in range(0,len(tri.simplices)-1):
-        triPath = trianglePath(points, tri.simplices[i])
-        # testPoint = triangleCenter(TRIANGLE_VERTICES)
-        # if path.contains_point(testPoint) and tri_path.contains_point(testPoint):
-        #     print "Triangle is within the polygon"
-        #     interiorSimplices.append(tri.simplices[i])
-        # else:
-        #     print "Not in polygon"
-    print interiorSimplices[:]
+        triPath,triPoints = trianglePath(points, tri.simplices[i])
+        testPoint = triangleCenter(triPoints)
+        if path.contains_point(testPoint) and triPath.contains_point(testPoint):
+            print "Triangle is within the polygon"
+            interiorSimplices.append(tri.simplices[i])
+        else:
+            print "Not in polygon"
 
-    plt.triplot(points[:,0], points[:,1], tri.simplices.copy())
+    plt.triplot(points[:,0], points[:,1], interiorSimplices)
     plt.plot(points[:,0], points[:,1], 'o')
     plt.show()
 
 def trianglePath(points, pointIndices):
-    print points[pointIndices[0]]
     triPoints = [
     [points.item(pointIndices[0],0),points.item(pointIndices[0],1)],
     [points.item(pointIndices[1],0),points.item(pointIndices[1],1)],
     [points.item(pointIndices[2],0),points.item(pointIndices[2],1)],
     [points.item(pointIndices[0],0),points.item(pointIndices[0],1)]
     ]
-    print "^^^^^^^^"
-    print triPoints
     codes = [Path.MOVETO,
              Path.LINETO,
              Path.LINETO,
              Path.CLOSEPOLY,
              ]
     triPath = Path(triPoints, codes)
-    return triPath
+    return [triPath,triPoints]
 
 def triangleCenter(vertices):
     centerX = (vertices[0][0] + vertices[1][0] + vertices[2][0]) / 3;
