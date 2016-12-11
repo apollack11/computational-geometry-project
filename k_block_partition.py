@@ -80,9 +80,10 @@ def main():
 
     interiorSimplices = []
     for i in range(0,len(tri.simplices)-1):
-        triPath,triPoints = trianglePath(points, tri.simplices[i])
-        testPoint = triangleCenter(triPoints)
-        if path.contains_point(testPoint) and triPath.contains_point(testPoint):
+        part_of_triangulation = True
+        tri_path,tri_points = triangle_path(points, tri.simplices[i])
+        test_point = triangle_center(tri_points)
+        if path.contains_point(test_point) and tri_path.contains_point(test_point):
             print "Triangle is within the polygon"
             interiorSimplices.append(tri.simplices[i])
         else:
@@ -92,8 +93,8 @@ def main():
     plt.plot(points[:,0], points[:,1], 'o')
     plt.show()
 
-def trianglePath(points, pointIndices):
-    triPoints = [
+def triangle_path(points, pointIndices):
+    tri_points = [
     [points.item(pointIndices[0],0),points.item(pointIndices[0],1)],
     [points.item(pointIndices[1],0),points.item(pointIndices[1],1)],
     [points.item(pointIndices[2],0),points.item(pointIndices[2],1)],
@@ -104,14 +105,25 @@ def trianglePath(points, pointIndices):
              Path.LINETO,
              Path.CLOSEPOLY,
              ]
-    triPath = Path(triPoints, codes)
-    return [triPath,triPoints]
+    tri_path = Path(tri_points, codes)
+    return [tri_path,tri_points]
 
-def triangleCenter(vertices):
+def triangle_center(vertices):
     centerX = (vertices[0][0] + vertices[1][0] + vertices[2][0]) / 3;
     centerY = (vertices[0][1] + vertices[1][1] + vertices[2][1]) / 3;
     return (centerX, centerY)
 
+def line_intersection(line1, line2):
+    print line1
+    print line2
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    return div != 0
 
 if __name__ == '__main__':
     main()
